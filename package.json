@@ -1,0 +1,92 @@
+{
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "android": "expo start --android",
+    "ci": "jest --ci",
+    "eject": "expo eject",
+    "ios": "expo start --ios",
+    "lint": "eslint .",
+    "publish-test": "expo publish -c --release-channel testing",
+    "start": "expo start",
+    "test": "jest --watchAll",
+    "translate": "i18next-scanner",
+    "updateSnapshots": "jest -u --coverage=false",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@assets/images": "link:assets/images",
+    "@expo/vector-icons": "^10.0.0",
+    "@react-native-community/datetimepicker": "3.0.0",
+    "@react-native-community/masked-view": "0.1.10",
+    "@react-navigation/bottom-tabs": "^5.9.2",
+    "@react-navigation/native": "^5.7.6",
+    "@react-navigation/stack": "^5.9.3",
+    "@react-navigation/web": "^1.0.0-alpha.9",
+    "expo": "^39.0.0",
+    "expo-asset": "~8.2.0",
+    "expo-font": "~8.3.0",
+    "expo-linking": "^1.0.4",
+    "expo-localization": "~9.0.0",
+    "expo-notifications": "~0.7.2",
+    "expo-screen-orientation": "~2.0.0",
+    "expo-updates": "~0.3.3",
+    "expo-web-browser": "~8.5.0",
+    "i18next": "^19.8.2",
+    "i18next-fetch-backend": "^3.0.0",
+    "i18next-scanner": "^2.10.3",
+    "mitt": "^2.1.0",
+    "moment": "^2.29.1",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-i18next": "^11.7.3",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-39.0.0.tar.gz",
+    "react-native-appearance": "~0.3.3",
+    "react-native-collapsible": "^1.5.3",
+    "react-native-dotenv": "^2.4.1",
+    "react-native-extended-stylesheet": "^0.12.0",
+    "react-native-gesture-handler": "~1.7.0",
+    "react-native-keyboard-aware-scroll-view": "^0.9.3",
+    "react-native-modal-datetime-picker": "^9.0.0",
+    "react-native-picker-select": "^8.0.0",
+    "react-native-popover-view": "^3.0.3",
+    "react-native-reanimated": "~1.13.0",
+    "react-native-safe-area-context": "3.1.4",
+    "react-native-screens": "~2.10.1",
+    "react-native-svg": "12.1.0",
+    "react-native-web": "~0.13.7",
+    "sentry-expo": "^2.1.2",
+    "socketcluster-client": "^16.0.1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.4.0",
+    "@typescript-eslint/parser": "^4.4.0",
+    "babel-preset-expo": "^8.3.0",
+    "chalk": "^4.1.0",
+    "eslint": "^7.10.0",
+    "eslint-config-universe": "^5.0.0",
+    "fs": "^0.0.1-security",
+    "jest-expo": "^39.0.0",
+    "prettier": "^2.1.2",
+    "react-devtools": "^4.8.2",
+    "react-native-svg-transformer": "^0.14.3",
+    "typescript": "~3.9.2"
+  },
+  "eslintConfig": {
+    "extends": "universe/native"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "node_modules/(?!(jest-)?react-native|react-clone-referenced-element|@react-native-community|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*|@unimodules/.*|sentry-expo|native-base|unimodules-permissions-interface|@sentry/react-native)"
+    ],
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "**/*.{js,jsx}",
+      "!**/coverage/**",
+      "!**/node_modules/**",
+      "!**/babel.config.js",
+      "!**/jest.setup.js"
+    ]
+  },
+  "private": true
+}

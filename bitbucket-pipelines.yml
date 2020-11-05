@@ -1,0 +1,46 @@
+# This is a sample build configuration for JavaScript.
+# Check our guides at https://confluence.atlassian.com/x/14UWN for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+image: node:lts-alpine
+
+pipelines:
+  default:
+    - step:
+        name: Build & test
+        caches:
+          - node
+        script:
+          - apk add --no-cache bash
+          - ./create_env.sh $SENTRY_DSN $TRANSLATIONS_API_KEY
+          - yarn install
+          - yarn lint
+          - yarn ci
+  branches:
+    master:
+      - step:
+          name: Build & test
+          caches:
+            - node
+          script:
+            - apk add --no-cache bash
+            - ./create_env.sh $SENTRY_DSN $TRANSLATIONS_API_KEY
+            - yarn install
+            - yarn lint
+            - yarn ci
+      - step:
+          # Publish to expo staging channel (bitbucket deployment == test)
+          name: Expo publish
+          deployment: test
+          caches:
+            - node
+          script:
+            - apk add --no-cache bash
+            - ./create_env.sh $SENTRY_DSN $TRANSLATIONS_API_KEY
+            - export SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+            - export SENTRY_ORG=$SENTRY_ORG
+            - export SENTRY_PROJECT=$SENTRY_PROJECT
+            - yarn global add expo-cli
+            - expo login --username $EXPO_USERNAME --password $EXPO_PASSWORD
+            - expo publish -c --non-interactive --release-channel staging

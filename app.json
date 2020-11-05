@@ -1,0 +1,83 @@
+{
+  "expo": {
+    "name": "Port Activity App",
+    "owner": "kleklekle",
+    "slug": "spia",
+    "privacy": "public",
+    "scheme": "portactivity",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "version": "1.1.7",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#070D39"
+    },
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 30000
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "package": "com.unikie.spia",
+      "versionCode": 11,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "https",
+              "host": "example.com"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ],
+          "autoVerify": true
+        }
+      ],
+      "useNextNotificationsApi": true
+    },
+    "ios": {
+      "bundleIdentifier": "com.unikie.spia",
+      "buildNumber": "1.1.7",
+      "supportsTablet": true,
+      "associatedDomains": [
+        "applinks:example.com",
+        "webcredentials:example.com"
+      ],
+      "requireFullScreen": true
+    },
+    "notification": {
+      "icon": "./assets/images/notification-icon.png",
+      "iosDisplayInForeground": false
+    },
+    "packagerOpts": {
+      "config": "metro.config.js",
+      "sourceExts": [
+        "js",
+        "jsx",
+        "ts",
+        "tsx",
+        "svg"
+      ]
+    },
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {}
+        }
+      ]
+    }
+  }
+}
