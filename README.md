@@ -16,9 +16,13 @@ See:
 
 ### Run project
 - copy .env.template to .env
-- set LOCALHOST to your computer's ip
-- set LOCALPORT if required
-- set SENTRY_DSN if you want to develop with sentry
+- set DEV_API_ENDPOINT to your computer's ip:port
+- set DEV_SOCKETCLUSTER_HOST to your computer's ip
+- set DEV_SOCKETCLUSTER_PORT to  to your computer's dev port
+- DEV_TILE_SERVER to your computer's ip:port
+- DEV_TILE_TEMPLATE to desired template (default '/tile/{z}/{x}/{y}.png')
+- DEV_TRANSLATIONS_API_ENDPOINT to your computer's ip:port if required
+- set SENTRY_DSN if you want to develop with sentry. NOTE: Currently Sentry DSN must be set to prevent crashing of library
 - set TRANSLATIONS_API_KEY if you want to send missing translations to the backend
   (apikey can be created from webui)
 - `expo start` or `expo r -c` (clear cache)

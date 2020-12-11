@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="SVGRoot" width="64px" height="64px" version="1.1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <radialGradient id="radialGradient4649" cx="32" cy="32" r="15.813" gradientTransform="matrix(1 0 0 2.0077 0 -32.246)" gradientUnits="userSpaceOnUse">
+   <stop stop-opacity="0" offset="0"/>
+   <stop offset="1"/>
+  </radialGradient>
+ </defs>
+ <metadata>
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <path d="m31.998 0.2525-15.811 21.829v41.666c5.2711 0 10.54-5.9523 15.811-5.9523 5.2711 0 10.544 5.9523 15.815 5.9523v-41.666zm-0.03192 32.134c0.01513-0.0077-0.01513 0.0077 0 0z" fill="url(#radialGradient4649)"/>
+ <path d="m31.998 0.2525-15.811 21.829v41.666c5.2711 0 10.54-5.9523 15.811-5.9523 5.2711 0 10.544 5.9523 15.815 5.9523v-41.666zm-0.03192 32.134c0.01513-0.0077-0.01513 0.0077 0 0z" fill="currentColor" fill-opacity=".75" opacity=".75"/>
+</svg>

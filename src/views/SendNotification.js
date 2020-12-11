@@ -54,7 +54,7 @@ const SendNotificationScreen = ({ navigation, route }) => {
 
   return (
     <ProcessingAwareView processing={processing} style={styles.container}>
-      {ship ? <PortcallHeader section={section} t={t} /> : <PortHeader namespace={namespace} t={t} />}
+      {ship ? <PortcallHeader section={section} namespace={namespace} /> : <PortHeader namespace={namespace} />}
       <KeyboardAwareScrollView
         contentContainerStyle={styles.scrollStyle}
         enableOnAndroid
@@ -98,7 +98,8 @@ const SendNotificationScreen = ({ navigation, route }) => {
   );
 };
 
-const PortHeader = ({ namespace, t }) => {
+const PortHeader = ({ namespace }) => {
+  const { t } = useTranslation(namespace);
   return (
     <View style={styles.portHeader}>
       <Text style={styles.portHeaderTitle}>{t('Global notification')}</Text>
@@ -111,7 +112,6 @@ const PortHeader = ({ namespace, t }) => {
 
 PortHeader.propTypes = {
   namespace: PropTypes.string.isRequired,
-  t: PropTypes.func.isRequired,
 };
 
 const styles = EStyleSheet.create({

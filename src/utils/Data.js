@@ -98,7 +98,8 @@ export const localSearchShips = (text, data) => {
     }
     return [];
   }
-  return data;
+  //return data;
+  return null;
 };
 
 export const getPinnedIndices = (portCalls, pinnedVessels) => {
@@ -120,4 +121,20 @@ export const getFilteredNotifications = (notifications, filter) => {
     return notifications;
   }
   return notifications.filter((notification) => notification.type === filter);
+};
+
+export const localSearchMap = (text, data) => {
+  if (text) {
+    if (data) {
+      const found = data.filter((entry) => {
+        return Object.values(entry.properties).find((value) => {
+          return value && String(value).toLowerCase().includes(text.toLowerCase());
+        });
+      });
+      return found.sort((a, b) => a.properties.name > b.properties.name);
+    }
+    return [];
+  }
+  //return data;
+  return [];
 };

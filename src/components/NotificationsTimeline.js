@@ -1,28 +1,30 @@
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, { memo, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
 import { AuthContext } from '../context/Auth';
 import { getPortName } from '../utils/Helpers';
 
-export const NotificationsEvent = memo(({ item, t }) => {
+export const NotificationsEvent = memo(({ item }) => {
   const { namespace, userInfo } = useContext(AuthContext);
 
   return (
     <View style={styles.eventContainer}>
-      <Notification item={item} namespace={namespace} t={t} userInfo={userInfo} />
+      <Notification item={item} namespace={namespace} userInfo={userInfo} />
     </View>
   );
 });
 
 NotificationsEvent.propTypes = {
   item: PropTypes.object.isRequired,
-  t: PropTypes.func.isRequired,
 };
 
-const Notification = memo(({ item, namespace, t, userInfo }) => {
+// TOOO: Evaluate if memo is unnecessary
+const Notification = memo(({ item, namespace, userInfo }) => {
+  const { t } = useTranslation(namespace);
   const { created_at, message, type, sender, ship, ship_imo } = item;
   let name = '';
   if (type === 'ship') {
@@ -58,7 +60,6 @@ const Notification = memo(({ item, namespace, t, userInfo }) => {
 Notification.propTypes = {
   item: PropTypes.object.isRequired,
   namespace: PropTypes.string.isRequired,
-  t: PropTypes.func.isRequired,
   userInfo: PropTypes.object.isRequired,
 };
 

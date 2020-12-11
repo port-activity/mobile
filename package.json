@@ -2,10 +2,14 @@
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "android": "expo start --android",
-    "ci": "jest --ci",
+    "ci": "jest --ci --silent",
     "eject": "expo eject",
     "ios": "expo start --ios",
     "lint": "eslint .",
+    "publish-qa-gavle": "expo publish -c --config ./app.gavle.json --release-channel qa-gavle",
+    "publish-qa-rauma": "expo publish -c --config ./app.rauma.json --release-channel qa-rauma",
+    "publish-prod-gavle": "expo publish -c --config ./app.gavle.json --release-channel prod-gavle",
+    "publish-prod-rauma": "expo publish -c --config ./app.rauma.json --release-channel prod-rauma",
     "publish-test": "expo publish -c --release-channel testing",
     "start": "expo start",
     "test": "jest --watchAll",
@@ -15,8 +19,10 @@
   },
   "dependencies": {
     "@assets/images": "link:assets/images",
+    "@expo/react-native-action-sheet": "^3.8.0",
     "@expo/vector-icons": "^10.0.0",
     "@react-native-community/datetimepicker": "3.0.0",
+    "@react-native-community/hooks": "^2.6.0",
     "@react-native-community/masked-view": "0.1.10",
     "@react-navigation/bottom-tabs": "^5.9.2",
     "@react-navigation/native": "^5.7.6",
@@ -36,6 +42,7 @@
     "i18next-scanner": "^2.10.3",
     "mitt": "^2.1.0",
     "moment": "^2.29.1",
+    "polylabel": "^1.1.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-i18next": "^11.7.3",
@@ -46,6 +53,8 @@
     "react-native-extended-stylesheet": "^0.12.0",
     "react-native-gesture-handler": "~1.7.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.3",
+    "react-native-map-clustering": "^3.3.9",
+    "react-native-maps": "0.27.1",
     "react-native-modal-datetime-picker": "^9.0.0",
     "react-native-picker-select": "^8.0.0",
     "react-native-popover-view": "^3.0.3",
@@ -54,7 +63,7 @@
     "react-native-screens": "~2.10.1",
     "react-native-svg": "12.1.0",
     "react-native-web": "~0.13.7",
-    "sentry-expo": "^2.1.2",
+    "sentry-expo": "^3.0.3",
     "socketcluster-client": "^16.0.1"
   },
   "devDependencies": {
@@ -69,7 +78,8 @@
     "prettier": "^2.1.2",
     "react-devtools": "^4.8.2",
     "react-native-svg-transformer": "^0.14.3",
-    "typescript": "~3.9.2"
+    "react-native-testing-library": "^6.0.0",
+    "typescript": "~4.1.2"
   },
   "eslintConfig": {
     "extends": "universe/native"

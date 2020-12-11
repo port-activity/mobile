@@ -1,5 +1,5 @@
 import moment from 'moment';
-import * as Sentry from 'sentry-expo';
+import { Native as Sentry } from 'sentry-expo';
 
 import { defaultPortList } from './Constants';
 
@@ -10,6 +10,8 @@ export const getUserInfoFromResponse = (sessionId, userInfo) => {
       firstName: userInfo.user.first_name,
       id: userInfo.user.id,
       lastName: userInfo.user.last_name,
+      mapDefaultCoordinates: userInfo.map_default_coordinates,
+      mapDefaultZoom: userInfo.map_default_zoom,
       modules: userInfo.modules || {},
       permissions: userInfo.user.permissions || [],
       role: userInfo.user.role,
@@ -32,6 +34,8 @@ export const getUserInfoFromResponse = (sessionId, userInfo) => {
     Sentry.setExtra('userInfo', {
       id: userResp.id,
       username: userResp.email,
+      mapDefaultCoordinates: userResp.mapDefaultCoordinates,
+      mapDefaultZoom: userResp.mapDefaultZoom,
       modules: userResp.modules,
       permissions: userResp.permissions,
       role: userResp.role,

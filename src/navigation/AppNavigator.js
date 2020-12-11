@@ -4,12 +4,13 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import * as Sentry from 'sentry-expo';
+import { Native as Sentry } from 'sentry-expo';
 
 import { getEnvVars } from '../../environment';
 import PushNotificationsListener from '../components/PushNotificationsListener';
 import { DarkStatusBar, LightStatusBar } from '../components/StatusBar';
 import { DataProvider } from '../context/Data';
+import { NotificationsProvider } from '../context/Notifications';
 import { navigationRef, isMountedRef } from '../navigation/NavigationService';
 import AuthNavigator from './AuthNavigator';
 import MainTabNavigator from './MainTabNavigator';
@@ -72,9 +73,11 @@ const AppNavigator = ({ emitter, namespace, notification, userInfo }) => {
       <NavigationContainer initialState={initialState} ref={navigationRef}>
         {userInfo && userInfo.sessionId ? (
           <DataProvider>
-            <LightStatusBar />
-            <MainTabNavigator t={t} />
-            <PushNotificationsListener notification={notification} />
+            <NotificationsProvider>
+              <LightStatusBar />
+              <MainTabNavigator t={t} />
+              <PushNotificationsListener notification={notification} />
+            </NotificationsProvider>
           </DataProvider>
         ) : (
           <>

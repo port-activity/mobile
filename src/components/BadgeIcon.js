@@ -4,10 +4,10 @@ import { Text, View } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
 import { AuthContext } from '../context/Auth';
-import { DataContext } from '../context/Data';
+import { NotificationsContext } from '../context/Notifications';
 
 export const IconWithBadge = ({ IconClass, name, color, size }) => {
-  const { notifications } = useContext(DataContext);
+  const { notifications } = useContext(NotificationsContext);
   const { userInfo } = useContext(AuthContext);
 
   const notificationCount = notifications

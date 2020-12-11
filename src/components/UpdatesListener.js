@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Dimensions, Text, TouchableOpacity } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import Popover, { Rect } from 'react-native-popover-view';
-import { useSafeArea } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AuthContext } from '../context/Auth';
 import { TAB_BAR_HEIGHT } from '../utils/Constants';
@@ -21,7 +21,7 @@ const UpdatesListener = () => {
   const [shouldFetch, setShouldFetch] = useState(!!Constants.manifest.releaseChannel);
   const [popupVisible, setPopupVisible] = useState(false);
 
-  const insets = useSafeArea();
+  const insets = useSafeAreaInsets();
   const yPosition = Math.round(Dimensions.get('window').height) - (TAB_BAR_HEIGHT + 8 + insets.bottom);
   const xPosition = 0;
 
@@ -56,7 +56,7 @@ const UpdatesListener = () => {
     <Popover
       arrowStyle={{ backgroundColor: 'transparent' }}
       isVisible={popupVisible}
-      fromRect={new Rect(xPosition, yPosition, 1, 1)}
+      from={new Rect(xPosition, yPosition, 1, 1)}
       mode="tooltip"
       placement="top"
       popoverStyle={styles.updateDialog}>

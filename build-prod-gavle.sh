@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ $# -lt 5 ]] ; then
+if [[ $# -lt 6 ]] ; then
     echo "Usage: $0 <android keystore path> <android keystore alias> <ios dist cert path> <ios push id> <ios push p8 path> <ios prov profile path>"
     exit 1
 fi
@@ -18,6 +18,6 @@ expo ba --config ./app.gavle.json --release-channel prod-gavle --type app-bundle
 
 # Build iOS
 echo ">>> Building iOS production-release for Gävle"
-expo bi --type archive --config ./app.gavle.json --release-channel prod-gavle --team-id $TEAM_ID --dist-p12-path $DIST_P12_PATH --push-id $PUSH_ID --push-p8-path $PUSH_P8_PATH --provisioning-profile-path $PROV_PROFILE_PATH
+expo bi --type archive --config ./app.gavle.json --release-channel prod-gavle --team-id N335UMVM8A --dist-p12-path $DIST_P12_PATH --push-id $PUSH_ID --push-p8-path $PUSH_P8_PATH --provisioning-profile-path $PROV_PROFILE_PATH
 
 exit 0

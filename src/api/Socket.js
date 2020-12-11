@@ -1,4 +1,4 @@
-import * as Sentry from 'sentry-expo';
+import { Native as Sentry } from 'sentry-expo';
 import socketClusterClient from 'socketcluster-client';
 
 import { getEnvVars } from '../../environment';
@@ -81,7 +81,7 @@ export const addDataEventListener = async (socket, channelName, callback) => {
 };
 
 export const authenticate = async (socket, token) => {
-  if (token) {
+  if (socket && token) {
     try {
       const res = await socket.authenticate(token);
       if (res.authError) {
@@ -110,6 +110,13 @@ export const removeEventListeners = (socket) => {
       await socket.listener('unsubscribe').once();
     });
     console.log('All channels closed');
+  }
+};
+
+export const removeEventListener = async (socket, channel) => {
+  if (socket && channel) {
+    await socket.unsubscribe(channel);
+    console.log(`${channel} closed`);
   }
 };
 

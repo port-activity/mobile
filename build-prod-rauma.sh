@@ -18,6 +18,6 @@ expo ba --config ./app.rauma.json --release-channel prod-rauma --type app-bundle
 
 # Build iOS
 echo ">>> Building iOS production-release for Rauma"
-expo bi --config ./app.rauma.json --release-channel prod-rauma --team-id $TEAM_ID --dist-p12-path $DIST_P12_PATH --push-id $PUSH_ID --push-p8-path $PUSH_P8_PATH --provisioning-profile-path $PROV_PROFILE_PATH
+expo bi --type archive --config ./app.rauma.json --release-channel prod-rauma --team-id N335UMVM8A --dist-p12-path $DIST_P12_PATH --push-id $PUSH_ID --push-p8-path $PUSH_P8_PATH --provisioning-profile-path $PROV_PROFILE_PATH
 
 exit 0

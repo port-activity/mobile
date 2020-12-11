@@ -1,15 +1,16 @@
 import moment from 'moment';
 import React, { forwardRef, memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
 import { HeaderBadges, ShipInfo } from './PortcallTimeline';
 
 export const SlotItem = memo(
-  forwardRef((props) => {
-    const { headerStyle, item, index, setActiveHeader, t } = props;
-
-    const formatTs = (ts) => (ts ? moment(ts).format('DD.MM.YYYY HH:mm') : 'n/a');
+  forwardRef((props, ref) => {
+    const { headerStyle, item, index, namespace, setActiveHeader } = props;
+    const { t } = useTranslation(namespace);
+    const formatTs = (ts) => (ts ? moment(ts).format('DD.MM.YYYY HH:mm') : t('N/A'));
 
     const Timerow = ({ text, ts, badges }) => (
       <View style={styles.timeRow}>
@@ -59,10 +60,10 @@ export const SlotItem = memo(
                 ]}
               />
               <ShipInfo name={item.vessel_name} nationality={item.vessel_nationality} />
-              <Timerow text="RTA" ts={item.rta_window_start} />
-              <Timerow text="JIT ETA" ts={item.jit_eta} />
+              <Timerow text={t('RTA')} ts={item.rta_window_start} />
+              <Timerow text={t('JIT ETA')} ts={item.jit_eta} />
               <Timerow
-                text="Live ETA"
+                text={t('Live ETA')}
                 ts={item.live_eta}
                 badges={[
                   {
@@ -71,7 +72,7 @@ export const SlotItem = memo(
                   },
                 ]}
               />
-              <Timerow text="PTD" ts={item.ptd} />
+              <Timerow text={t('PTD')} ts={item.ptd} />
             </View>
           </View>
         </TouchableOpacity>

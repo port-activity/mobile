@@ -2,26 +2,29 @@ import { Entypo } from '@expo/vector-icons';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
-export const LogisticsEvent = memo(({ event, t }) => {
+export const LogisticsEvent = memo(({ event, namespace }) => {
   const left = event.direction === 'In';
 
   return (
     <View style={styles.eventContainer}>
-      {left ? <LogisticsTimestamp event={event} t={t} /> : <View style={styles.placeholder} />}
-      {left ? <View style={styles.placeholder} /> : <LogisticsTimestamp event={event} t={t} />}
+      {left ? <LogisticsTimestamp event={event} namespace={namespace} /> : <View style={styles.placeholder} />}
+      {left ? <View style={styles.placeholder} /> : <LogisticsTimestamp event={event} namespace={namespace} />}
     </View>
   );
 });
 
 LogisticsEvent.propTypes = {
   event: PropTypes.object.isRequired,
-  t: PropTypes.func.isRequired,
+  namespace: PropTypes.string.isRequired,
 };
 
-const LogisticsTimestamp = memo(({ event, t }) => {
+// TOOO: Evaluate if memo is unnecessary
+const LogisticsTimestamp = memo(({ event, namespace }) => {
+  const { t } = useTranslation(namespace);
   const left = event.direction === 'In';
   const nationality = event.front_license_plates.length > 0 ? event.front_license_plates[0].nationality : t('N/A');
   const regNo =
@@ -54,7 +57,7 @@ const LogisticsTimestamp = memo(({ event, t }) => {
 
 LogisticsTimestamp.propTypes = {
   event: PropTypes.object.isRequired,
-  t: PropTypes.func.isRequired,
+  namespace: PropTypes.string.isRequired,
 };
 
 export const LogisticsItemSeparator = memo(() => {

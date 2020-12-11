@@ -1,5 +1,6 @@
 import Images from '@assets/images';
 import { SENTRY_DSN } from '@env';
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -8,9 +9,9 @@ import React, { Suspense, useState, useEffect } from 'react';
 import { AppState, Platform } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { enableScreens } from 'react-native-screens';
 import * as Sentry from 'sentry-expo';
 
-//import { enableScreens } from 'react-native-screens';
 import { jsVersion } from './environment';
 import i18n from './i18n'; // eslint-disable-line
 import Loader from './src/components/Loader';
@@ -24,12 +25,16 @@ import LoadingScreen from './src/views/Loading';
 
 Sentry.init({
   debug: !!SENTRY_DSN && !Constants.manifest.releaseChannel,
+  // Currently Sentry DSN must be set to prevent crashing of library
   dsn: SENTRY_DSN,
   enableInExpoDevelopment: true,
   environment: Constants.manifest.releaseChannel || 'development',
+  enableAutoSessionTracking: true,
+  // Sessions close after app is 10 seconds in the background.
+  sessionTrackingIntervalMillis: 10000,
+  release: Constants.manifest.revisionId,
 });
-Sentry.setRelease(Constants.manifest.revisionId);
-Sentry.setTags({
+Sentry.Native.setTags({
   'release-channel': Constants.manifest.releaseChannel || 'default',
   nativeBuildVersion: Constants.nativeBuildVersion || 'N/A',
   version: Constants.manifest.version,
@@ -37,7 +42,7 @@ Sentry.setTags({
   jsVersion,
 });
 
-//enableScreens();
+enableScreens();
 
 EStyleSheet.build(theme);
 
@@ -70,16 +75,19 @@ const App = ({ skipLoadingScreen }) => {
     // TODO: Orientation lock forced until landscape modes are done
     await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
 
+    // Note: locking on expo client does not seem to work for status bar, but standalone builds are fine
     if (Platform.OS === 'ios') {
+      /*
       const iosVersion = parseInt(Platform.Version.match(/^([0-9]+)\./)[1], 10);
       if (iosVersion < 13) {
-        // can't set lockPlatformAsync since app crashes for older ios versions
-      } else {
-        await ScreenOrientation.lockPlatformAsync({ screenOrientationArrayIOS: ['PORTRAIT_UP'] });
-      }
+        // TODO: disable lockPlatformAsync for older ios versions if app crashes
+      } else {*/
+      await ScreenOrientation.lockPlatformAsync({
+        screenOrientationArrayIOS: [ScreenOrientation.Orientation.PORTRAIT_UP],
+      });
+      //}
     }
 
-    //await ScreenOrientation.unlockAsync();
     try {
       await cacheAssetsAsync({
         images: Object.values(Images),
@@ -120,27 +128,29 @@ const App = ({ skipLoadingScreen }) => {
     <SafeAreaProvider>
       <Suspense fallback={<Loader />}>
         <ErrorBoundary>
-          <AuthProvider emitter={emitter}>
-            <AuthContext.Consumer>
-              {({ namespace, userInfo }) => {
-                if ((userInfo && appIsReady) || skipLoadingScreen) {
-                  return (
-                    <>
-                      <AppNavigator
-                        emitter={emitter}
-                        namespace={namespace}
-                        notification={notification}
-                        userInfo={userInfo}
-                      />
-                      <UpdatesListener />
-                    </>
-                  );
-                } else {
-                  return <LoadingScreen />;
-                }
-              }}
-            </AuthContext.Consumer>
-          </AuthProvider>
+          <ActionSheetProvider>
+            <AuthProvider emitter={emitter}>
+              <AuthContext.Consumer>
+                {({ namespace, userInfo }) => {
+                  if ((userInfo && appIsReady) || skipLoadingScreen) {
+                    return (
+                      <>
+                        <AppNavigator
+                          emitter={emitter}
+                          namespace={namespace}
+                          notification={notification}
+                          userInfo={userInfo}
+                        />
+                        <UpdatesListener />
+                      </>
+                    );
+                  } else {
+                    return <LoadingScreen />;
+                  }
+                }}
+              </AuthContext.Consumer>
+            </AuthProvider>
+          </ActionSheetProvider>
         </ErrorBoundary>
       </Suspense>
     </SafeAreaProvider>

@@ -52,7 +52,7 @@ export const ActionsPopOver = forwardRef((props, ref) => {
         }}
         arrowStyle={showArrow ? styles.arrowStyle : styles.hiddenArrow}
         isVisible={isVisible}
-        fromView={ref}
+        from={ref}
         onRequestClose={closePopover}
         placement={placement ? placement : 'auto'}
         verticalOffset={Platform.OS === 'ios' ? 0 : -StatusBar.currentHeight}>

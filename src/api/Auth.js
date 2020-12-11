@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 import * as Localization from 'expo-localization';
-import * as Sentry from 'sentry-expo';
+import { Native as Sentry } from 'sentry-expo';
 
 import { getEnvVars } from '../../environment';
 import { STATUS_AUTHENTICATION_FAILED, STATUS_ERROR, STATUS_OK, STATUS_SESSION_EXPIRED } from '../utils/Constants';
@@ -10,9 +10,13 @@ const { API_ENDPOINT } = getEnvVars();
 const LOGIN_PATH = 'login';
 const VALIDATE_SESSION_PATH = 'session';
 const REGISTER_PATH = 'register';
+const CODELESS_REGISTER_PATH = 'codeless-register';
+const PUBLIC_SETTINGS_PATH = 'public-settings?name=';
 const REGISTER_PUSH_TOKEN_PATH = 'register-push-token';
 const REQUEST_PASSWORD_RESET_PATH = 'request-password-reset';
 const RESET_PASSWORD_PATH = 'reset-password';
+
+export const PUBLIC_SETTINGS_KEY_CODELESS_REGISTRATION = 'codeless_registration_module';
 
 export const apiCall = async (method, path, data, sessionId) => {
   if (path.match(/^\//)) {
@@ -78,10 +82,18 @@ export const login = async (email, password) => {
     password,
   });
   if (response) {
-    if (response.status === 200) {
-      return await response.json();
+    try {
+      const resp = await response.json();
+      if (response.status === 200) {
+        return resp;
+      }
+      //console.log(`${response.url} failed, ok:${response.ok} status:${response.status} text:${response.statusText}`);
+      if (resp && resp.error) {
+        console.log('Error: ', resp.error);
+      }
+    } catch (error) {
+      Sentry.captureException(error);
     }
-    console.log(`${response.url} failed, ok:${response.ok} status:${response.status} text:${response.statusText}`);
   }
   return null;
 };
@@ -89,29 +101,77 @@ export const login = async (email, password) => {
 export const validateSession = async (sessionId) => {
   const response = await apiCall('get', VALIDATE_SESSION_PATH, null, sessionId);
   if (response) {
-    if (response.status === 200) {
-      return await response.json();
+    try {
+      const resp = await response.json();
+      if (response.status === 200) {
+        return resp;
+      }
+      //console.log(`${response.url} failed, ok:${response.ok} status:${response.status} text:${response.statusText}`);
+      if (resp && resp.error) {
+        console.log('Error: ', resp.error);
+      }
+    } catch (error) {
+      Sentry.captureException(error);
     }
-    //console.log(`${response.url} failed, ok:${response.ok} status:${response.status} text:${response.statusText}`);
-    const resp = await response.json();
-    if (resp && resp.error) {
-      console.log('Error: ', resp.error);
+  }
+  return null;
+};
+
+export const getPublicSettingsForKey = async (key) => {
+  if (!key) {
+    console.error('Error: settings key missing');
+    return null;
+  }
+  const response = await apiCall('get', `${PUBLIC_SETTINGS_PATH}${key}`, null, null);
+  if (response) {
+    try {
+      const data = await response.json();
+      if (response.status === 200) {
+        if (data && data[key]) {
+          return data[key];
+        }
+        console.log('Error: invalid public settings response');
+      }
+      //console.log(`${response.url} failed, ok:${response.ok} status:${response.status} text:${response.statusText}`);
+      if (data && data.error) {
+        console.log('Error: ', data.error);
+      }
+    } catch (error) {
+      Sentry.captureException(error);
     }
   }
   return null;
 };
 
 export const registerNewUser = async (firstName, lastName, code, email, password) => {
-  const response = await apiCall('post', REGISTER_PATH, {
-    first_name: firstName,
-    last_name: lastName,
-    code,
-    email,
-    password,
-  });
+  let response = null;
+  if (code) {
+    response = await apiCall('post', REGISTER_PATH, {
+      first_name: firstName,
+      last_name: lastName,
+      code,
+      email,
+      password,
+    });
+  } else {
+    response = await apiCall('post', CODELESS_REGISTER_PATH, {
+      first_name: firstName,
+      last_name: lastName,
+      email,
+      password,
+    });
+  }
   if (response) {
-    if (response.status === 200) {
-      return await response.json();
+    try {
+      const resp = await response.json();
+      if (response.status === 200) {
+        return resp;
+      }
+      if (resp && resp.error) {
+        return resp;
+      }
+    } catch (error) {
+      Sentry.captureException(error);
     }
     // TODO: remove logging
     console.log(`${response.url} failed, ok:${response.ok} status:${response.status} text:${response.statusText}`);
@@ -132,14 +192,21 @@ export const registerPushToken = async (sessionId, pushToken) => {
     sessionId
   );
   if (response) {
-    if (response.status === 200) {
-      const status = await response.json();
-      if (!status.error) {
-        console.log('Push token registered');
+    try {
+      const resp = await response.json();
+      if (response.status === 200) {
+        if (!resp.error) {
+          console.log('Push token registered');
+        }
+        return !resp.error;
       }
-      return !status.error;
+      //console.log(`${response.url} failed, ok:${response.ok} status:${response.status} text:${response.statusText}`);
+      if (resp && resp.error) {
+        console.log('Error: ', resp.error);
+      }
+    } catch (error) {
+      Sentry.captureException(error);
     }
-    console.log(`${response.url} failed, ok:${response.ok} status:${response.status} text:${response.statusText}`);
   }
   return false;
 };
@@ -150,11 +217,19 @@ export const requestPasswordReset = async (email, port) => {
     port,
   });
   if (response) {
-    if (response.status === 200) {
-      return await response.json();
+    try {
+      const resp = await response.json();
+      if (response.status === 200) {
+        return resp;
+      }
+      // TODO: remove logging, show success every time to prevent email phishing
+      //console.log(`${response.url} failed, ok:${response.ok} status:${response.status} text:${response.statusText}`);
+      if (resp && resp.error) {
+        console.log('Error: ', resp.error);
+      }
+    } catch (error) {
+      Sentry.captureException(error);
     }
-    // TODO: remove logging, show success every time to prevent email phishing
-    console.log(`${response.url} failed, ok:${response.ok} status:${response.status} text:${response.statusText}`);
   }
   return null;
 };
@@ -165,11 +240,19 @@ export const resetPassword = async (password, token) => {
     token,
   });
   if (response) {
-    if (response.status === 200) {
-      return await response.json();
+    try {
+      const resp = await response.json();
+      if (response.status === 200) {
+        return resp;
+      }
+      // TODO: remove logging, show success every time to prevent email phishing
+      //console.log(`${response.url} failed, ok:${response.ok} status:${response.status} text:${response.statusText}`);
+      if (resp && resp.error) {
+        console.log('Error: ', resp.error);
+      }
+    } catch (error) {
+      Sentry.captureException(error);
     }
-    // TODO: remove logging, show success every time to prevent email phishing
-    console.log(`${response.url} failed, ok:${response.ok} status:${response.status} text:${response.statusText}`);
   }
   return null;
 };

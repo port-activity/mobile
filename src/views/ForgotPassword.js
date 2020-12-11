@@ -28,8 +28,12 @@ const ForgotPasswordScreen = () => {
         setResetRequested(true);
         console.log('reset reqeuested');
       } else {
+        let msg = t('There was an error processing your request. Please try again.');
+        if (resp && resp.error) {
+          msg = resp.error;
+        }
         emitter.emit('showToast', {
-          message: t('There was an error processing your request. Please try again.'),
+          message: msg,
           duration: 5000,
           type: 'error',
         });

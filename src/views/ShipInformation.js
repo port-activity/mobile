@@ -17,7 +17,7 @@ const ShipInformationScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <PortcallHeader section={section} t={t} />
+      <PortcallHeader section={section} namespace={namespace} />
       <ScrollView>
         <View style={styles.content}>
           <Text style={styles.title}>{t('Ship information')}</Text>

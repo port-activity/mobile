@@ -6,8 +6,8 @@ import NavigationService from '../navigation/NavigationService';
 import { shouldShowNotification } from '../utils/Helpers';
 
 const PushNotificationsListener = ({ notification = {} }) => {
-  const { emitter, pinnedVessels, portCalls } = useContext(DataContext);
-  const { isModuleEnabled, userInfo } = useContext(AuthContext);
+  const { pinnedVessels, portCalls } = useContext(DataContext);
+  const { emitter, isModuleEnabled, userInfo } = useContext(AuthContext);
 
   useEffect(() => {
     if (notification.data && notification.data.type) {

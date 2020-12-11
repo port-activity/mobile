@@ -77,7 +77,7 @@ const RecommendTimeScreen = ({ navigation, route }) => {
 
   return (
     <ProcessingAwareView processing={processing} style={styles.container}>
-      <PortcallHeader section={section} t={t} />
+      <PortcallHeader section={section} namespace={namespace} />
       <ScrollView>
         <View style={styles.content}>
           <Text style={styles.title}>Recommend time (RTA)</Text>

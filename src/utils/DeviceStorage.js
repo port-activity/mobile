@@ -1,5 +1,5 @@
 import { AsyncStorage } from 'react-native';
-import * as Sentry from 'sentry-expo';
+import { Native as Sentry } from 'sentry-expo';
 
 import { defaultUserInfo } from '../utils/Constants';
 

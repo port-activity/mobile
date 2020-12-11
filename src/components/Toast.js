@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { View, Animated, Dimensions, Text, ViewPropTypes } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
-import { useSafeArea } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { TAB_BAR_HEIGHT } from '../utils/Constants';
 import { getPortName } from '../utils/Helpers';
@@ -29,14 +29,14 @@ const Toast = forwardRef((props, ref) => {
     animation: null,
     isShowing: false,
     opacityValue: new Animated.Value(opacity),
-    textOrComponent: '',
+    textOrElement: '',
     timer: null,
   };
 
   const [state, setStateAsync] = useAsyncSetState(initState);
   const getState = useGetState(state);
 
-  const { isShowing, opacityValue, textOrComponent } = state;
+  const { isShowing, opacityValue, textOrElement } = state;
   const [toastTop, setToastTop] = useState(position);
   const [closeCallback, setCloseCallback] = useState(null);
 
@@ -88,7 +88,7 @@ const Toast = forwardRef((props, ref) => {
       ...s,
       //animation: newAnimation,
       isShowing: true,
-      textOrComponent,
+      textOrElement: textOrComponent,
       timer: null,
     }));
 
@@ -173,10 +173,10 @@ const Toast = forwardRef((props, ref) => {
     <View style={[styles.container, { top: pos }]} onLayout={onLayout}>
       <TouchableWithoutFeedback style={styles.touchable} onPress={onToastTap}>
         <Animated.View style={[styles.content, { opacity: opacityValue }, toastStyle]}>
-          {React.isValidElement(textOrComponent) ? (
-            textOrComponent
+          {React.isValidElement(textOrElement) ? (
+            textOrElement
           ) : (
-            <Text style={[styles.text, textStyle]}>{textOrComponent}</Text>
+            <Text style={[styles.text, textStyle]}>{textOrElement}</Text>
           )}
         </Animated.View>
       </TouchableWithoutFeedback>
@@ -196,7 +196,7 @@ Toast.propTypes = {
 
 export const NotificationToast = forwardRef((props, ref) => {
   const { placement, position } = props;
-  const insets = useSafeArea();
+  const insets = useSafeAreaInsets();
   let pos = position;
   if (typeof pos === 'undefined') {
     pos = TAB_BAR_HEIGHT + 8 + insets.bottom;
@@ -212,7 +212,7 @@ NotificationToast.propTypes = {
 
 export const ErrorToast = forwardRef((props, ref) => {
   const { placement, position } = props;
-  const insets = useSafeArea();
+  const insets = useSafeAreaInsets();
   let pos = position;
   if (typeof pos === 'undefined') {
     pos = TAB_BAR_HEIGHT + 8 + insets.bottom;
@@ -228,7 +228,7 @@ ErrorToast.propTypes = {
 
 export const SuccessToast = forwardRef((props, ref) => {
   const { placement, position } = props;
-  const insets = useSafeArea();
+  const insets = useSafeAreaInsets();
   let pos = position;
   if (typeof pos === 'undefined') {
     pos = TAB_BAR_HEIGHT + 8 + insets.bottom;

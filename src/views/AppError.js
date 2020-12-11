@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { withTranslation } from 'react-i18next';
 import { Image, Text, View } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import * as Sentry from 'sentry-expo';
+import { Native as Sentry } from 'sentry-expo';
 
 import { getEnvVars } from '../../environment';
 import { DarkStatusBar } from '../components/StatusBar';

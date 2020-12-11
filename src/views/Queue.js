@@ -6,18 +6,18 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 
 import { SlotItem } from '../components/SlotItem';
 import { AuthContext } from '../context/Auth';
-import { DataContext } from '../context/Data';
+import { QueueContext, QueueProvider } from '../context/Queue';
 
-const QueueScreen = ({ navigation }) => {
+const Queue = ({ navigation }) => {
   const { namespace } = useContext(AuthContext);
-  const { getSlotReservations, slotReservations } = useContext(DataContext);
+  const { getSlotReservations, slotReservations } = useContext(QueueContext);
   const [fetchingData, setFetchingData] = useState(false);
   const listRef = useRef();
   const { t } = useTranslation(namespace);
   //console.log('Activity: ns=', t.ns);
 
   const renderHeader = ({ item, index }) => {
-    return <SlotItem headerStyle={styles.header} item={item} index={index} t={t} />;
+    return <SlotItem headerStyle={styles.header} item={item} index={index} namespace={namespace} />;
   };
 
   useEffect(() => {
@@ -29,6 +29,7 @@ const QueueScreen = ({ navigation }) => {
     await getSlotReservations();
     setFetchingData(false);
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.info}>
@@ -84,10 +85,18 @@ const styles = EStyleSheet.create({
   },
 });
 
-QueueScreen.propTypes = {
+Queue.propTypes = {
   navigation: PropTypes.shape({
     navigate: PropTypes.func.isRequired,
   }).isRequired,
+};
+
+const QueueScreen = (props) => {
+  return (
+    <QueueProvider>
+      <Queue {...props} />
+    </QueueProvider>
+  );
 };
 
 export default QueueScreen;

@@ -1,31 +1,28 @@
+import { useIsFocused } from '@react-navigation/native';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState, useRef, useContext } from 'react';
-import { useTranslation } from 'react-i18next';
 import { FlatList, RefreshControl, View } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
 import { LogisticsEvent, LogisticsItemSeparator } from '../components/LogisticsTimeline';
 import { AuthContext } from '../context/Auth';
-import { DataContext } from '../context/Data';
+import { LogisticsContext, LogisticsProvider } from '../context/Logistics';
 
-export const LogisticsScreen = ({ navigation }) => {
+export const Logistics = ({ navigation }) => {
   const { namespace } = useContext(AuthContext);
-  const { getAllLogisticsTimestamps, logisticsTimestamps } = useContext(DataContext);
+  const { getAllLogisticsTimestamps, logisticsTimestamps } = useContext(LogisticsContext);
   const [fetchingData, setFetchingData] = useState(false);
   const listRef = useRef();
-  const { t } = useTranslation(namespace);
   //console.log('Logistics: ns=', t.ns);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    if (navigation.isFocused()) {
+    // TODO: refetching on every focus should not
+    // be needed if sockets are working properly
+    if (isFocused) {
       onRefresh();
     }
-    const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh();
-    });
-
-    return unsubscribe;
-  }, []);
+  }, [isFocused]);
 
   const onRefresh = async () => {
     setFetchingData(true);
@@ -37,7 +34,7 @@ export const LogisticsScreen = ({ navigation }) => {
   };
 
   const renderItem = ({ item, index }) => {
-    return <LogisticsEvent event={item} t={t} />;
+    return <LogisticsEvent event={item} namespace={namespace} />;
   };
 
   return (
@@ -77,8 +74,16 @@ const styles = EStyleSheet.create({
   },
 });
 
-LogisticsScreen.propTypes = {
+Logistics.propTypes = {
   navigation: PropTypes.object.isRequired,
+};
+
+const LogisticsScreen = (props) => {
+  return (
+    <LogisticsProvider>
+      <Logistics {...props} />
+    </LogisticsProvider>
+  );
 };
 
 export default LogisticsScreen;

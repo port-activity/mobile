@@ -4,12 +4,12 @@ import React, { useState, useRef } from 'react';
 import { Platform, TextInput, TouchableOpacity, View } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
-const StyledSearch = ({ onSearch, t }) => {
+const StyledSearch = ({ containerStyle, onEndEditing, onFocus, onSearch, t }) => {
   const [showClearButton, setShowClearButton] = useState(false);
   const inputRef = useRef();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyle]}>
       <View style={styles.inputGroup}>
         <View style={styles.imageContainer}>
           <Search style={styles.searchIcon} />
@@ -21,13 +21,24 @@ const StyledSearch = ({ onSearch, t }) => {
           underlineColorAndroid="transparent"
           autoCapitalize="none"
           ref={(ref) => (inputRef.current = ref)}
-          onEndEditing={() => setShowClearButton(false)}
-          onFocus={() => setShowClearButton(true)}
+          onEndEditing={() => {
+            if (onEndEditing) {
+              onEndEditing();
+            }
+            setShowClearButton(false);
+          }}
+          onFocus={() => {
+            if (onFocus) {
+              onFocus();
+            }
+            setShowClearButton(true);
+          }}
           placeholder={t('Search for vessels')}
           placeholderTextColor="#747D7D"
           onChangeText={(text) => {
             onSearch(text);
           }}
+          returnKeyType="done"
         />
         {showClearButton && Platform.OS === 'android' ? (
           <View style={styles.clearImageContainer}>

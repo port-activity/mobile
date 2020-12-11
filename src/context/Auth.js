@@ -3,6 +3,14 @@ import { withTranslation } from 'react-i18next';
 import { Vibration } from 'react-native';
 
 import { getEnvVars } from '../../environment';
+import {
+  addDataEventListener,
+  authenticate,
+  initSocket,
+  removeEventListener,
+  removeEventListeners,
+  shutdownSocket,
+} from '../api/Socket';
 import { ErrorToast, FormattedNotification, NotificationToast, SuccessToast } from '../components/Toast';
 import {
   defaultUserInfo,
@@ -37,6 +45,7 @@ class AuthProvider extends Component {
       emitter: props.emitter,
       namespace: NAMESPACE,
       userInfo: null,
+      socket: null,
     };
     this.notificationToast = React.createRef();
     this.errorToast = React.createRef();
@@ -47,10 +56,13 @@ class AuthProvider extends Component {
     // Subscribe to toast events
     this.state.emitter.on('showToast', this.showToast);
     this.getSettings();
+    // Init socket
+    this.addDataEventSource();
   }
 
   componentWillUnmount() {
     this.state.emitter.off('showToast', this.showToast);
+    this.removeDataEventSource();
   }
 
   getSettings = async () => {
@@ -162,17 +174,67 @@ class AuthProvider extends Component {
     }
   };
 
+  addDataEventSource = async () => {
+    const { socket, userInfo } = this.state;
+    const jwt = (userInfo && userInfo.signedJWTAuthToken) || null;
+    if (this.socket && this.socket.signedAuthToken !== jwt) {
+      // signedAuthToken has updated, reauthenticate
+      if (!(await authenticate(socket, jwt))) {
+        this.removeDataEventSource(true);
+      }
+    }
+    if (!socket) {
+      const newSocket = await initSocket();
+      this.setState({
+        socket: newSocket,
+      });
+      if (!(await authenticate(newSocket, jwt))) {
+        this.removeDataEventSource(true);
+      }
+    }
+  };
+
+  removeDataEventSource = async (disconnect = false) => {
+    const { socket } = this.state;
+    if (socket) {
+      console.log('Un-subscribing to port call data events');
+      removeEventListeners(socket);
+      if (disconnect) {
+        shutdownSocket(socket);
+        this.setState({
+          socket: null,
+        });
+      }
+    }
+  };
+
+  addEventsListener = async (channel, callback) => {
+    const { socket } = this.state;
+    // console.log('Adding to port call data event listener');
+    await this.addDataEventSource();
+
+    await addDataEventListener(socket, channel, callback);
+  };
+
+  removeEventsListener = async (channel) => {
+    const { socket } = this.state;
+    await removeEventListener(socket, channel);
+  };
+
   render() {
     return (
       <AuthContext.Provider
         value={{
           ...this.state,
           authenticatedApiCall: this.authenticatedApiCall,
+          addEventsListener: this.addEventsListener,
           getUserInfoFromResponse: this.getUserInfoFromResponse,
           hasPermission: this.hasPermission,
           isModuleEnabled: this.isModuleEnabled,
           logIn: this.logIn,
           logOut: this.logOut,
+          removeEventsListener: this.removeEventsListener,
+          removeDataEventSource: this.removeDataEventSource,
           setDisableVibration: this.setDisableVibration,
           setNamespace: this.setNamespace,
           setUserInfo: this.setUserInfo,
@@ -186,12 +248,12 @@ class AuthProvider extends Component {
   }
 }
 
-const withAuthContext = (Component) => {
+const withAuthContext = (Element) => {
   return (props) => {
     return (
       <AuthContext.Consumer>
         {({ ...rest }) => {
-          return <Component {...props} {...rest} />;
+          return <Element {...props} {...rest} />;
         }}
       </AuthContext.Consumer>
     );

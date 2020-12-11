@@ -1,6 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
-import * as Sentry from 'sentry-expo';
+import { Native as Sentry } from 'sentry-expo';
 
 export default async function registerForPushNotificationsAsync() {
   const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);

@@ -1,12 +1,17 @@
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import PropTypes from 'prop-types';
-import React, { useState, useRef, useContext } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Keyboard, View } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
 import { getEnvVars } from '../../environment';
-import { login, registerPushToken } from '../api/Auth';
+import {
+  getPublicSettingsForKey,
+  login,
+  PUBLIC_SETTINGS_KEY_CODELESS_REGISTRATION,
+  registerPushToken,
+} from '../api/Auth';
 import { AuthForm, AuthLink, AuthPortName, AuthTitle, AuthView } from '../components/Authentication';
 import StyledButton from '../components/Button';
 import { StyledInput } from '../components/Input';
@@ -22,6 +27,7 @@ const LoginScreen = ({ port = '' }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [processing, setProcessing] = useState(false);
+  const [allowCodelessRegistration, setAllowCodelessRegistration] = useState(false);
   const { t } = useTranslation(namespace);
   //console.log('Login: ns=', t.ns);
   const navigation = useNavigation();
@@ -30,6 +36,15 @@ const LoginScreen = ({ port = '' }) => {
 
   const usernameTextInputRef = useRef();
   const passwordTextInputRef = useRef();
+
+  useEffect(() => {
+    if (isFocused) {
+      (async () => {
+        const res = await getPublicSettingsForKey(PUBLIC_SETTINGS_KEY_CODELESS_REGISTRATION);
+        setAllowCodelessRegistration(res === 'enabled');
+      })();
+    }
+  }, [isFocused]);
 
   const loginHandler = async () => {
     Keyboard.dismiss();
@@ -46,8 +61,12 @@ const LoginScreen = ({ port = '' }) => {
         logIn(resp);
       } else {
         setProcessing(false);
+        let msg = t('Invalid E-mail or password. Please try again.');
+        if (resp && resp.message && resp.message !== 'authentication failed') {
+          msg = resp.message;
+        }
         emitter.emit('showToast', {
-          message: t('Invalid E-mail or password. Please try again.'),
+          message: msg,
           duration: 5000,
           type: 'error',
         });
@@ -76,7 +95,13 @@ const LoginScreen = ({ port = '' }) => {
             <StyledInput label={t('Email')} />
             <StyledInput label={t('Password')} />
             <StyledButton title={t('Login')} buttonStyle={styles.login} />
-            <StyledButton title={t('Register as a New User')} buttonStyle={styles.register} />
+            {allowCodelessRegistration ? (
+              <StyledButton buttonStyle={styles.codelessRegister} title={t('Register without code')} />
+            ) : null}
+            <StyledButton
+              title={allowCodelessRegistration ? t('Register with code') : t('Register as a New User')}
+              buttonStyle={styles.register}
+            />
           </AuthForm>
           {NAMESPACE === 'common' ? (
             <AuthLink linkStyle={styles.selectPortLink}>{t('Back to port selection')}</AuthLink>
@@ -134,13 +159,23 @@ const LoginScreen = ({ port = '' }) => {
             onPress={() => loginHandler()}
             title={t('Login')}
           />
+          {allowCodelessRegistration ? (
+            <StyledButton
+              buttonStyle={styles.codelessRegister}
+              onPress={() => {
+                Keyboard.dismiss();
+                navigation.navigate('Register', { codeless: true, port: portName });
+              }}
+              title={t('Register without code')}
+            />
+          ) : null}
           <StyledButton
             buttonStyle={styles.register}
             onPress={() => {
               Keyboard.dismiss();
               navigation.navigate('Register', { port: portName });
             }}
-            title={t('Register as a New User')}
+            title={allowCodelessRegistration ? t('Register with code') : t('Register as a New User')}
           />
         </AuthForm>
         {NAMESPACE === 'common' ? (
@@ -181,6 +216,13 @@ const styles = EStyleSheet.create({
     borderWidth: 1,
     borderStyle: 'solid',
     borderColor: '#747D7D',
+  },
+  codelessRegister: {
+    backgroundColor: '$color_secondary',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: '#747D7D',
+    marginBottom: '$gap',
   },
   selectPortLink: {
     marginBottom: '$gap',

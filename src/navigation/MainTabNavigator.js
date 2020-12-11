@@ -1,18 +1,18 @@
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StackActions } from '@react-navigation/native';
+import { getFocusedRouteNameFromRoute, StackActions } from '@react-navigation/native';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
-import Constants from 'expo-constants';
-import React, { useContext } from 'react';
-import { useSafeArea } from 'react-native-safe-area-context';
+import React, { useContext, useEffect, useState } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { IconWithBadge } from '../components/BadgeIcon';
 import HeaderTitle from '../components/HeaderTitle';
 import { AuthContext } from '../context/Auth';
-import { TAB_BAR_HEIGHT } from '../utils/Constants';
+import { NotificationsContext } from '../context/Notifications';
+import { HEADER_HEIGHT, TAB_BAR_HEIGHT } from '../utils/Constants';
 import ActivityScreen from '../views/Activity';
 import AddTimestampScreen from '../views/AddTimestamp';
 import LogisticsScreen from '../views/Logistics';
+import MapScreen from '../views/Map';
 import NotificationsScreen from '../views/Notifications';
 import ProfileScreen from '../views/Profile';
 import QueueScreen from '../views/Queue';
@@ -31,41 +31,48 @@ const config = Platform.select({
 });
 */
 
-const defaultScreenOptions = ({ navigation }) => ({
+const defaultScreenOptions = ({ navigation, topInset }) => ({
   cardOverlayEnabled: true,
   gestureEnabled: true,
   headerLeft: () => null,
   headerRight: () => null,
   headerStyle: {
     backgroundColor: '#070D39',
-    height: 64 + Constants.statusBarHeight,
+    height: HEADER_HEIGHT + topInset,
   },
   headerTitle: () => <HeaderTitle />,
   headerTitleAlign: 'center',
   safeAreaInsets: {
-    top: Constants.statusBarHeight, // Prevent header content jumping when rendering
+    top: topInset, // Prevent header content jumping when rendering
   },
   ...TransitionPresets.SlideFromRightIOS,
 });
 
 const ActivityStack = ({ navigation, route }) => {
-  React.useEffect(
+  const { topInset } = route.params;
+  // Reset stack when navigating away
+  useEffect(
     () =>
       navigation.addListener('blur', () => {
         //console.log('tab pressed');
-        if (route.state && route.state.index) {
+        const routeName = getFocusedRouteNameFromRoute(route) ?? 'Activity';
+        //console.log(routeName);
+        if (routeName !== 'Activity') {
           //console.log(route);
           navigation.dispatch({
             ...StackActions.popToTop(),
-            target: route.state,
+            target: ActivityStack,
           });
         }
       }),
-    [navigation, route.state]
+    [navigation, route]
   );
 
   return (
-    <Stack.Navigator headerMode="float" initialRouteName="Activity" screenOptions={defaultScreenOptions}>
+    <Stack.Navigator
+      headerMode="float"
+      initialRouteName="Activity"
+      screenOptions={(options) => defaultScreenOptions({ navigation: options.navigation, topInset })}>
       <Stack.Screen name="Activity" component={ActivityScreen} options={{ headerTitle: () => <HeaderTitle /> }} />
       <Stack.Screen
         name="Vessel"
@@ -97,69 +104,87 @@ const ActivityStack = ({ navigation, route }) => {
 };
 
 const QueueStack = ({ navigation, route }) => {
-  React.useEffect(
+  const { topInset } = route.params;
+  // Reset stack when navigating away
+  useEffect(
     () =>
       navigation.addListener('blur', () => {
         //console.log('tab pressed');
-        if (route.state && route.state.index) {
+        const routeName = getFocusedRouteNameFromRoute(route) ?? 'Queue';
+        if (routeName !== 'Queue') {
           //console.log(route);
           navigation.dispatch({
             ...StackActions.popToTop(),
-            target: route.state,
+            target: QueueStack,
           });
         }
       }),
-    [navigation, route.state]
+    [navigation, route]
   );
 
   return (
-    <Stack.Navigator headerMode="float" initialRouteName="Queue" screenOptions={defaultScreenOptions}>
+    <Stack.Navigator
+      headerMode="float"
+      initialRouteName="Queue"
+      screenOptions={(options) => defaultScreenOptions({ navigation: options.navigation, topInset })}>
       <Stack.Screen name="Queue" component={QueueScreen} options={{ headerTitle: () => <HeaderTitle /> }} />
     </Stack.Navigator>
   );
 };
 
 const LogisticsStack = ({ navigation, route }) => {
-  React.useEffect(
+  const { topInset } = route.params;
+  // Reset stack when navigating away
+  useEffect(
     () =>
       navigation.addListener('blur', () => {
         //console.log('tab pressed');
-        if (route.state && route.state.index) {
+        const routeName = getFocusedRouteNameFromRoute(route) ?? 'Logistics';
+        if (routeName !== 'Logistics') {
           //console.log(route);
           navigation.dispatch({
             ...StackActions.popToTop(),
-            target: route.state,
+            target: LogisticsStack,
           });
         }
       }),
-    [navigation, route.state]
+    [navigation, route]
   );
 
   return (
-    <Stack.Navigator headerMode="float" initialRouteName="Logistics" screenOptions={defaultScreenOptions}>
+    <Stack.Navigator
+      headerMode="float"
+      initialRouteName="Logistics"
+      screenOptions={(options) => defaultScreenOptions({ navigation: options.navigation, topInset })}>
       <Stack.Screen name="Logistics" component={LogisticsScreen} />
     </Stack.Navigator>
   );
 };
 
 const NotificationsStack = ({ navigation, route }) => {
-  React.useEffect(
+  const { topInset } = route.params;
+  // Reset stack when navigating away
+  useEffect(
     () =>
       navigation.addListener('blur', () => {
         //console.log('tab pressed');
-        if (route.state && route.state.index) {
+        const routeName = getFocusedRouteNameFromRoute(route) ?? 'Notifications';
+        if (routeName !== 'Notifications') {
           //console.log(route);
           navigation.dispatch({
             ...StackActions.popToTop(),
-            target: route.state,
+            target: NotificationsStack,
           });
         }
       }),
-    [navigation, route.state]
+    [navigation, route]
   );
 
   return (
-    <Stack.Navigator headerMode="float" initialRouteName="Notifications" screenOptions={defaultScreenOptions}>
+    <Stack.Navigator
+      headerMode="float"
+      initialRouteName="Notifications"
+      screenOptions={(options) => defaultScreenOptions({ navigation: options.navigation, topInset })}>
       <Stack.Screen name="Notifications" component={NotificationsScreen} />
       <Stack.Screen
         name="SendGlobalNotification"
@@ -170,24 +195,59 @@ const NotificationsStack = ({ navigation, route }) => {
   );
 };
 
-const ProfileStack = ({ navigation, route }) => {
-  React.useEffect(
+const MapStack = ({ navigation, route }) => {
+  const { topInset } = route.params;
+  // Reset stack when navigating away
+  useEffect(
     () =>
       navigation.addListener('blur', () => {
         //console.log('tab pressed');
-        if (route.state && route.state.index) {
+        const routeName = getFocusedRouteNameFromRoute(route) ?? 'Map';
+        if (routeName !== 'Map') {
           //console.log(route);
           navigation.dispatch({
             ...StackActions.popToTop(),
-            target: route.state,
+            target: MapStack,
           });
         }
       }),
-    [navigation, route.state]
+    [navigation, route]
   );
 
   return (
-    <Stack.Navigator headerMode="float" initialRouteName="Profile" screenOptions={defaultScreenOptions}>
+    <Stack.Navigator
+      headerMode="float"
+      initialRouteName="Map"
+      screenOptions={(options) => defaultScreenOptions({ navigation: options.navigation, topInset })}>
+      <Stack.Screen name="Map" component={MapScreen} />
+    </Stack.Navigator>
+  );
+};
+
+const ProfileStack = ({ navigation, route }) => {
+  const { topInset } = route.params;
+  // Reset stack when navigating away
+  useEffect(
+    () =>
+      navigation.addListener('blur', () => {
+        //console.log('tab pressed');
+        const routeName = getFocusedRouteNameFromRoute(route) ?? 'Profile';
+        if (routeName !== 'Profile') {
+          //console.log(route);
+          navigation.dispatch({
+            ...StackActions.popToTop(),
+            target: ProfileStack,
+          });
+        }
+      }),
+    [navigation, route]
+  );
+
+  return (
+    <Stack.Navigator
+      headerMode="float"
+      initialRouteName="Profile"
+      screenOptions={(options) => defaultScreenOptions({ navigation: options.navigation, topInset })}>
       <Stack.Screen name="Profile" component={ProfileScreen} />
     </Stack.Navigator>
   );
@@ -195,7 +255,10 @@ const ProfileStack = ({ navigation, route }) => {
 
 const MainTabNavigator = ({ t }) => {
   const { isModuleEnabled } = useContext(AuthContext);
-  const insets = useSafeArea();
+  const { newNotificationsCount } = useContext(NotificationsContext);
+  const insets = useSafeAreaInsets();
+  const [topInset] = useState(insets.top);
+
   return (
     <Tab.Navigator
       backBehavior="history"
@@ -229,10 +292,11 @@ const MainTabNavigator = ({ t }) => {
           options={{
             tabBarLabel: t('Activity'),
             tabBarIcon: ({ focused, color }) => {
-              return <MaterialCommunityIcons name="anchor" size={32} color={color} style={{ top: 3 }} />;
+              return <MaterialCommunityIcons name="anchor" size={32} color={color} />;
             },
             unmountOnBlur: false,
           }}
+          initialParams={{ topInset }}
         />
       ) : null}
       {isModuleEnabled('queue_module') ? (
@@ -242,10 +306,11 @@ const MainTabNavigator = ({ t }) => {
           options={{
             tabBarLabel: t('Queue'),
             tabBarIcon: ({ focused, color }) => {
-              return <MaterialCommunityIcons name="timetable" size={32} color={color} style={{ top: 3 }} />;
+              return <MaterialCommunityIcons name="timetable" size={32} color={color} />;
             },
             unmountOnBlur: false,
           }}
+          initialParams={{ topInset }}
         />
       ) : null}
       {isModuleEnabled('logistics_module') ? (
@@ -255,10 +320,11 @@ const MainTabNavigator = ({ t }) => {
           options={{
             tabBarLabel: t('Logistics'),
             tabBarIcon: ({ focused, color }) => {
-              return <MaterialCommunityIcons name="truck" size={32} color={color} style={{ top: 3 }} />;
+              return <MaterialCommunityIcons name="truck" size={32} color={color} />;
             },
             unmountOnBlur: false,
           }}
+          initialParams={{ topInset }}
         />
       ) : null}
       <Tab.Screen
@@ -267,12 +333,36 @@ const MainTabNavigator = ({ t }) => {
         options={{
           tabBarLabel: t('Notifications'),
           tabBarIcon: ({ focused, color }) => {
-            const iconName = 'ios-information-circle';
-            return <IconWithBadge IconClass={Ionicons} name={iconName} size={32} color={color} />;
+            return <Ionicons name="ios-information-circle" size={32} color={color} />;
           },
           unmountOnBlur: false,
+          tabBarBadge: newNotificationsCount > 0 ? newNotificationsCount : null,
+          tabBarBadgeStyle: {
+            backgroundColor: '#D0011C',
+            fontFamily: 'Open Sans',
+            fontStyle: 'normal',
+            fontWeight: 'normal',
+            fontSize: 12,
+            textTransform: 'uppercase',
+            color: 'white',
+          },
         }}
+        initialParams={{ topInset }}
       />
+      {isModuleEnabled('map_module') ? (
+        <Tab.Screen
+          name="MapStack"
+          component={MapStack}
+          options={{
+            tabBarLabel: t('Map'),
+            tabBarIcon: ({ focused, color }) => {
+              return <MaterialCommunityIcons name="map" size={32} color={color} />;
+            },
+            unmountOnBlur: false,
+          }}
+          initialParams={{ topInset }}
+        />
+      ) : null}
       <Tab.Screen
         name="ProfileStack"
         component={ProfileStack}
@@ -283,6 +373,7 @@ const MainTabNavigator = ({ t }) => {
           },
           unmountOnBlur: false,
         }}
+        initialParams={{ topInset }}
       />
     </Tab.Navigator>
   );

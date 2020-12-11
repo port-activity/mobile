@@ -1,4 +1,5 @@
 import { Add } from '@assets/images';
+import { useIsFocused } from '@react-navigation/native';
 import PropTypes from 'prop-types';
 import React, { useState, useRef, useEffect, useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,28 +8,31 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 
 import { NotificationsEvent } from '../components/NotificationsTimeline';
 import { AuthContext } from '../context/Auth';
-import { DataContext } from '../context/Data';
+import { NotificationsContext } from '../context/Notifications';
 import { getFilteredNotifications } from '../utils/Data';
 
 const NotificationsScreen = ({ navigation }) => {
   const { hasPermission, isModuleEnabled, namespace } = useContext(AuthContext);
-  const { getNotifications, notifications, setLatestNotification } = useContext(DataContext);
+  const { getNotifications, notifications, setLatestNotification } = useContext(NotificationsContext);
   const [fetchingData, setFetchingData] = useState(false);
   const [notificationsFilter, setNotificationsFilter] = useState(isModuleEnabled('activity_module') ? null : 'port');
   const listRef = useRef();
   const { t } = useTranslation(namespace);
   //console.log('Notifications: ns=', t.ns);
+  const [viewedTimestamp, setViewedTimestamp] = useState(null);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    if (navigation.isFocused()) {
+    // TODO: refetching on every focus should not
+    // be needed if sockets are working properly
+    if (isFocused) {
       onRefresh();
     }
-    const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh();
-    });
+  }, [isFocused]);
 
-    return unsubscribe;
-  }, []);
+  useEffect(() => {
+    setLatestNotification(viewedTimestamp);
+  }, [viewedTimestamp]);
 
   const onRefresh = async () => {
     setFetchingData(true);
@@ -40,14 +44,15 @@ const NotificationsScreen = ({ navigation }) => {
   };
 
   const renderItem = ({ item, index }) => {
-    return <NotificationsEvent item={item} t={t} />;
+    return <NotificationsEvent item={item} />;
   };
 
   const _onViewableItemsChanged = useCallback(({ viewableItems, changed }) => {
     //console.log('Visible items are', viewableItems);
     //console.log('Changed in this iteration', changed);
+    // Use navigation.isFocused(), as it doesn't re-render the screen
     if (navigation.isFocused() && changed && changed.length && changed[0].isViewable && changed[0].item) {
-      setLatestNotification(changed[0].item.created_at);
+      setViewedTimestamp(changed[0].item.created_at);
     }
   }, []);
 

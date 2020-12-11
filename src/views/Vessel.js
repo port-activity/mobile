@@ -8,6 +8,7 @@ import { ActionsPopOver } from '../components/ActionsPopover';
 import { PortcallHeader, PortcallEvent } from '../components/PortcallTimeline';
 import { AuthContext } from '../context/Auth';
 import { DataContext } from '../context/Data';
+import NavigationService from '../navigation/NavigationService';
 import { filterEventsForShip, markCurrentTimestamp } from '../utils/Data';
 
 const TIMESTAMP_ESTIMATED_HEIGHT = Platform.OS === 'ios' ? 66.5 : 65.3; // TODO: rough estimate
@@ -26,6 +27,7 @@ const VesselScreen = ({ navigation, route }) => {
   const [headerDotsActions] = useState([
     { action: 'pin', title: t('Pin this vessel') },
     { action: 'info', title: t('Ship information') },
+    { action: 'map', title: t('Show on map') },
     ...(canAddTimestamp ? [{ action: 'add_timestamp', title: t('Add new timestamp') }] : []),
     ...(canSendPush ? [{ action: 'send_notification', title: t('Send notification') }] : []),
     ...(canSendRta ? [{ action: 'rta', title: t('Recommend time (RTA)') }] : []),
@@ -75,6 +77,12 @@ const VesselScreen = ({ navigation, route }) => {
           break;
         case 'info': // Ship information
           navigation.navigate('ShipInformation', { section: { ship }, namespace });
+          break;
+        case 'map': // Show on map
+          NavigationService.navigate('MapStack', {
+            screen: 'Map',
+            params: { initialSearch: `${ship.imo || ship.vessel_name}` },
+          });
           break;
         case 'add_timestamp': // Add new timestamp
           navigation.navigate('AddTimestamp', { section: { ship }, namespace });
@@ -155,7 +163,14 @@ const VesselScreen = ({ navigation, route }) => {
   };
 
   const renderContent = (ship, event) => {
-    return <PortcallEvent id={event.id} isPort={event.location === 'port'} t={t} timestamps={event.timestamps} />;
+    return (
+      <PortcallEvent
+        id={event.id}
+        isPort={event.location === 'port'}
+        namespace={namespace}
+        timestamps={event.timestamps}
+      />
+    );
   };
 
   const renderItem = ({ item, index }) => {
@@ -169,7 +184,7 @@ const VesselScreen = ({ navigation, route }) => {
         isPinned={Boolean(~pinnedVessels.indexOf(section.ship.imo))}
         isPinning={isPinning}
         section={headerSection}
-        t={t}
+        namespace={namespace}
         onActionPress={() => setShowPopOver(true)}
         onPinPress={handlePin}
         ref={(ref) => (popOverRef.current = ref)}
@@ -188,7 +203,7 @@ const VesselScreen = ({ navigation, route }) => {
         onAction={handleAction}
         onclose={() => setShowPopOver(false)}
         placement="bottom"
-        ref={popOverRef.current}
+        ref={popOverRef}
         show={showPopOver}
       />
       <FlatList

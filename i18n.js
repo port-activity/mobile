@@ -5,7 +5,7 @@ import moment from 'moment';
 import { initReactI18next } from 'react-i18next';
 import { AsyncStorage } from 'react-native';
 import 'moment/min/locales';
-import * as Sentry from 'sentry-expo';
+import { Native as Sentry } from 'sentry-expo';
 
 import { getEnvVars } from './environment';
 //import resources from './assets/languages';

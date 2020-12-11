@@ -3,11 +3,12 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, { forwardRef, memo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import Popover from 'react-native-popover-view';
 
-export const PortcallEvent = memo(({ id, timestamps, isPort, t }) => {
+export const PortcallEvent = memo(({ id, timestamps, isPort, namespace }) => {
   return (
     <View style={[styles.eventsContainer, isPort ? styles.portEvents : '']}>
       <View style={[styles.events, isPort ? styles.portEvents : '']}>
@@ -16,7 +17,7 @@ export const PortcallEvent = memo(({ id, timestamps, isPort, t }) => {
             <PortcallTimestamp
               isPort={isPort}
               key={`${id}-${timestamp.time_type}-${timestamp.state}-${timestamp.time}-${index}`} // TODO: index added for dev version
-              t={t}
+              namespace={namespace}
               timestamp={timestamp}
             />
           );
@@ -29,11 +30,13 @@ export const PortcallEvent = memo(({ id, timestamps, isPort, t }) => {
 PortcallEvent.propTypes = {
   id: PropTypes.number.isRequired,
   isPort: PropTypes.bool,
-  t: PropTypes.func.isRequired,
+  namespace: PropTypes.string.isRequired,
   timestamps: PropTypes.array.isRequired,
 };
 
-export const PortcallTimestamp = memo(({ isPort, t, timestamp }) => {
+// TOOO: Evaluate if memo is unnecessary
+export const PortcallTimestamp = memo(({ isPort, namespace, timestamp }) => {
+  const { t } = useTranslation(namespace);
   const time_state = timestamp.state.replace(/_/g, ' ');
 
   const showInfo = () => {
@@ -77,7 +80,7 @@ export const PortcallTimestamp = memo(({ isPort, t, timestamp }) => {
           <Popover
             isVisible={popupVisible}
             popoverStyle={styles.infoPopover}
-            fromView={popupRef.current}
+            from={popupRef}
             placement="left"
             onRequestClose={() => closeInfo()}>
             <Text style={styles.timestampSource}>
@@ -108,7 +111,7 @@ export const PortcallTimestamp = memo(({ isPort, t, timestamp }) => {
 PortcallTimestamp.propTypes = {
   isCurrent: PropTypes.bool,
   isPort: PropTypes.bool,
-  t: PropTypes.func.isRequired,
+  namespace: PropTypes.string.isRequired,
   timestamp: PropTypes.object.isRequired,
 };
 
@@ -122,8 +125,10 @@ export const PortcallHeader = memo(
       onPinPress,
       section: { ship },
       setActiveHeader,
-      t,
+      namespace,
     } = props;
+
+    const { t } = useTranslation(namespace);
 
     return (
       <View
@@ -197,16 +202,16 @@ export const PortcallHeader = memo(
   })
 );
 
-export const ShipInfo = ({ name, nationality }) => {
+export const ShipInfo = memo(({ name, nationality }) => {
   return (
     <View style={styles.headerTitleContainer}>
       <Text style={styles.headerTitle}>{name}</Text>
       <Text style={styles.headerNationality}>{nationality}</Text>
     </View>
   );
-};
+});
 
-export const HeaderBadges = ({ badges }) => {
+export const HeaderBadges = memo(({ badges }) => {
   if (badges) {
     return (
       <View style={styles.headerBadges}>
@@ -237,74 +242,81 @@ export const HeaderBadges = ({ badges }) => {
     );
   }
   return null;
-};
+});
 
-const InfoBadge = ({ text }) => {
+// TOOO: Evaluate if memo is unnecessary
+const InfoBadge = memo(({ text }) => {
   return (
     <View style={styles.infoBadge}>
       <Text style={styles.badgeText}>{text}</Text>
     </View>
   );
-};
+});
 
-const ArrivingBadge = ({ text }) => {
+// TOOO: Evaluate if memo is unnecessary
+const ArrivingBadge = memo(({ text }) => {
   return (
     <View style={[styles.infoBadge, styles.arrivingBadge]}>
       <Text style={[styles.badgeText, styles.arrivingBadgeText]}>{text}</Text>
     </View>
   );
-};
+});
 
-const AtBerthBadge = ({ text }) => {
+// TOOO: Evaluate if memo is unnecessary
+const AtBerthBadge = memo(({ text }) => {
   return (
     <View style={[styles.infoBadge, styles.atBerthBadge]}>
       <Text style={styles.badgeText}>{text}</Text>
     </View>
   );
-};
+});
 
-const DepartingBadge = ({ text }) => {
+// TOOO: Evaluate if memo is unnecessary
+const DepartingBadge = memo(({ text }) => {
   return (
     <View style={[styles.infoBadge, styles.departingBadge]}>
       <Text style={[styles.badgeText, styles.departingBadgeText]}>{text}</Text>
     </View>
   );
-};
+});
 
-const WarningBadge = ({ text }) => {
+// TOOO: Evaluate if memo is unnecessary
+const WarningBadge = memo(({ text }) => {
   return (
     <View style={[styles.infoBadge, styles.warningBadge]}>
       <Text style={styles.badgeText}>{text}</Text>
     </View>
   );
-};
+});
 
-const MediumWarningBadge = ({ text }) => {
+// TOOO: Evaluate if memo is unnecessary
+const MediumWarningBadge = memo(({ text }) => {
   return (
     <View style={[styles.infoBadge, styles.mediumwarningBadge]}>
       <Text style={styles.badgeText}>{text}</Text>
     </View>
   );
-};
+});
 
-const OkBadge = ({ text }) => {
+// TOOO: Evaluate if memo is unnecessary
+const OkBadge = memo(({ text }) => {
   return (
     <View style={[styles.infoBadge, styles.okBadge]}>
       <Text style={styles.badgeText}>{text}</Text>
     </View>
   );
-};
+});
 
 PortcallHeader.propTypes = {
   headerStyle: PropTypes.object,
   isPinned: PropTypes.bool,
   isPinning: PropTypes.bool,
+  namespace: PropTypes.string.isRequired,
   onActionPress: PropTypes.func,
   onPinPress: PropTypes.func,
   section: PropTypes.object.isRequired,
   setActiveHeader: PropTypes.func,
   setButtonRef: PropTypes.func,
-  t: PropTypes.func.isRequired,
 };
 
 const styles = EStyleSheet.create({
@@ -340,6 +352,7 @@ const styles = EStyleSheet.create({
   headerInfoContent: {
     flexDirection: 'column',
     flexGrow: 1,
+    flexShrink: 1,
   },
   headerBadges: {
     flexDirection: 'row',
@@ -500,6 +513,7 @@ const styles = EStyleSheet.create({
   event: {
     flexGrow: 1,
     alignSelf: 'center',
+    flexShrink: 1,
   },
   iconContainer: {
     justifyContent: 'center',

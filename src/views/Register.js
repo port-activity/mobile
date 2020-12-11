@@ -33,6 +33,10 @@ const RegisterScreen = () => {
   const passwordTextInputRef = useRef();
   const confirmPasswordTextInputRef = useRef();
 
+  const {
+    params: { codeless, port },
+  } = route;
+
   useEffect(() => {
     if (userInfo.sessionId) {
       setRegisterSent(true);
@@ -41,10 +45,10 @@ const RegisterScreen = () => {
 
   const registerHandler = async () => {
     Keyboard.dismiss();
-    if (firstName && lastName && code && email && password && confirmPassword) {
-      if (password.length < 12) {
+    if (firstName && lastName && (code || codeless) && email && password && confirmPassword) {
+      if (!password.length) {
         return emitter.emit('showToast', {
-          message: t('Password length must be at least 12 characters'),
+          message: t('Password cannot be empty!'),
           duration: 5000,
           type: 'error',
         });
@@ -88,10 +92,6 @@ const RegisterScreen = () => {
     }
   };
 
-  const {
-    params: { port },
-  } = route;
-
   return !registerSent ? (
     <>
       <AuthView>
@@ -117,27 +117,33 @@ const RegisterScreen = () => {
             onChangeText={(lastName) => setLastName(lastName)}
             onSubmitEditing={() => {
               setLastName(lastName.trim());
-              codeTextInputRef.current.focus();
+              if (codeless) {
+                emailTextInputRef.current.focus();
+              } else {
+                codeTextInputRef.current.focus();
+              }
             }}
             ref={lastNameTextInputRef}
             returnKeyType="next"
             textContentType="familyName"
             value={lastName}
           />
-          <StyledInput
-            autoCapitalize="none"
-            keyboardType="default"
-            label={t('Code')}
-            onChangeText={(code) => setCode(code)}
-            onSubmitEditing={() => {
-              setCode(code.trim());
-              emailTextInputRef.current.focus();
-            }}
-            ref={codeTextInputRef}
-            returnKeyType="next"
-            textContentType="oneTimeCode"
-            value={code}
-          />
+          {codeless ? null : (
+            <StyledInput
+              autoCapitalize="none"
+              keyboardType="default"
+              label={t('Code')}
+              onChangeText={(code) => setCode(code)}
+              onSubmitEditing={() => {
+                setCode(code.trim());
+                emailTextInputRef.current.focus();
+              }}
+              ref={codeTextInputRef}
+              returnKeyType="next"
+              textContentType="oneTimeCode"
+              value={code}
+            />
+          )}
           <StyledInput
             autoCapitalize="none"
             keyboardType="email-address"

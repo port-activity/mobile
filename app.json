@@ -10,7 +10,7 @@
       "android",
       "web"
     ],
-    "version": "1.1.7",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -28,15 +28,11 @@
     ],
     "android": {
       "package": "com.unikie.spia",
-      "versionCode": 11,
+      "versionCode": 20,
       "intentFilters": [
         {
           "action": "VIEW",
           "data": [
-            {
-              "scheme": "https",
-              "host": "example.com"
-            }
           ],
           "category": [
             "BROWSABLE",
@@ -45,15 +41,14 @@
           "autoVerify": true
         }
       ],
-      "useNextNotificationsApi": true
+      "useNextNotificationsApi": true,
+      "softwareKeyboardLayoutMode": "pan"
     },
     "ios": {
       "bundleIdentifier": "com.unikie.spia",
-      "buildNumber": "1.1.7",
+      "buildNumber": "1.2.0",
       "supportsTablet": true,
       "associatedDomains": [
-        "applinks:example.com",
-        "webcredentials:example.com"
       ],
       "requireFullScreen": true
     },
@@ -73,11 +68,8 @@
     },
     "hooks": {
       "postPublish": [
-        {
-          "file": "sentry-expo/upload-sourcemaps",
-          "config": {}
-        }
       ]
-    }
+    },
+    "sdkVersion": "39.0.0"
   }
 }

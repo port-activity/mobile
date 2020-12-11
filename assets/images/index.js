@@ -34,6 +34,10 @@ export Pin from './pin.svg';
 export Search from './search.svg';
 export Unpin from './unpin.svg';
 export Info from './info.svg';
+export Vessel from './vessel-icon.svg';
+export VesselArrow from './vessel-arrow-icon.svg';
+export VesselFull from './vessel-full-icon.svg';
+
 /* Port specific */
 export LogoInvertedGavle from './gavle/logo-inverted.svg';
 export LogoInvertedRauma from './rauma/logo-inverted.svg';

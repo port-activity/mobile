@@ -36,9 +36,9 @@ const ResetPasswordScreen = ({ emitter }) => {
   const resetPasswordHandler = async () => {
     Keyboard.dismiss();
     if (confirmPassword && password && token) {
-      if (password.length < 12) {
+      if (!password.length) {
         return emitter.emit('showToast', {
-          message: t('Password length must be at least 12 characters'),
+          message: t('Password cannot be empty!'),
           duration: 5000,
           type: 'error',
         });
@@ -62,8 +62,12 @@ const ResetPasswordScreen = ({ emitter }) => {
         setResetRequested(true);
         console.log('reset reqeuested');
       } else {
+        let msg = t('There was an error processing your request. Please try again.');
+        if (resp && resp.error) {
+          msg = resp.error;
+        }
         emitter.emit('showToast', {
-          message: t('There was an error processing your request. Please try again.'),
+          message: msg,
           duration: 2500,
           type: 'error',
         });
